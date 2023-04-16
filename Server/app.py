@@ -1,5 +1,6 @@
 import pandas as pd
 from flask import Flask, jsonify, request, url_for
+from sabrina_delay_reasons import analyze_flight_delays
 
 app = Flask(__name__)
 
@@ -43,6 +44,23 @@ def airport_delay_trend():
 
     # Renvoyer les données sous forme de JSON
     return jsonify(trend_data)
+
+
+#Analyse causes des retards
+@app.route("/api/flight_delays_reasons", methods=["GET"])
+def analyze_flight_delays_api():
+    year = request.args.get("year", type=int)
+    quarter = request.args.get("quarter", type=int)
+    month = request.args.get("month", type=int)
+    day_of_month = request.args.get("day_of_month", type=int)
+    day_of_week = request.args.get("day_of_week", type=int)
+    reporting_airline = request.args.get("reporting_airline", type=str)
+    origin_city_name = request.args.get("origin_city_name", type=str)
+    dest_city_name = request.args.get("dest_city_name", type=str)
+
+    result_json = analyze_flight_delays(year, quarter, month, day_of_month, day_of_week, reporting_airline, origin_city_name, dest_city_name)
+
+    return jsonify(result_json)
 
 if __name__ == "__main__":
     app.run(debug=True)
