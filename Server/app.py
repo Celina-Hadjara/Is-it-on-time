@@ -1,9 +1,10 @@
 import pandas as pd
 from flask import Flask, jsonify, request, url_for
 from sabrina_delay_reasons import analyze_flight_delays
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 # Charger les données de retard et les préparer pour l'analyse
 data = pd.read_csv('../ML/Datasets/DataFlightFinal.csv')
 
@@ -49,8 +50,19 @@ def airport_delay_trend():
 
 #Analyse causes des retards
 # Filtrer les données à partir de 2015
-data2015 = data
-#[data['Year'] >= 2015]
+data2015 = data[data['Year'] >= 2015]
+
+@app.route('/api/origins', methods=['GET'])
+def get_origins():
+    # Récupérer la liste des villes d'origine
+    origins = list(data['OriginCityName'].unique())
+    return jsonify(origins)
+
+@app.route('/api/destinations', methods=['GET'])
+def get_destinations():
+    # Récupérer la liste des villes de destination
+    destinations = list(data['DestCityName'].unique())
+    return jsonify(destinations)
 
 @app.route('/api/causes_delay', methods=['GET'])
 def get_delay():
