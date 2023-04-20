@@ -1,9 +1,7 @@
-from flask import Flask, jsonify, request
+from flask import jsonify, request, Blueprint
 from Server.data_loader import DataLoader
-from flask_cors import CORS
 
-app = Flask(__name__)
-CORS(app)
+app = Blueprint('Airport', __name__)
 
 # Charger les données de retard et les préparer pour l'analyse
 data = DataLoader.data
