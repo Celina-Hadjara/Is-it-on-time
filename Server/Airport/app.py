@@ -1,7 +1,11 @@
+import sys
+
 from flask import jsonify, request, Blueprint
-from Server.data_loader import DataLoader
+from DataLoader.data_loader import DataLoader
+from pathlib import Path
 
 app = Blueprint('Airport', __name__)
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Charger les données de retard et les préparer pour l'analyse
 data = DataLoader.data
@@ -10,7 +14,7 @@ data = DataLoader.data
 def calculate_trend_data(airport_data, delay_col):
     grouped_data = airport_data.groupby(["Month"]).agg(
         mean_delay=(delay_col, "mean"),
-        count_total=("Flight_Number_Reporting_Airline", "count"),
+        count_total=("Unique_Flight_ID", "count"),
         count_delayed=(delay_col, lambda x: x[x > 0].count()),
         count_cancelled=("Cancelled", "sum"),
         count_ontime=(delay_col, lambda x: x[x <= 0].count())
@@ -66,7 +70,3 @@ def airport_arr_delay_trend():
     trend_data["Month"] = list(grouped_data.index)
 
     return jsonify(trend_data)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
