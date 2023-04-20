@@ -7,43 +7,69 @@ CORS(app)
 
 # Charger les données de retard et les préparer pour l'analyse
 data = pd.read_csv('../ML/Datasets/DataFlightVersionFinal.csv')
+# Charger les données de retard et les préparer pour l'analyse
+data = pd.read_csv('../ML/Datasets/DataFlightVersionFinal.csv')
+data = data[data["Year"] > 2014]
 
-@app.route("/api/airport_list", methods=["GET"])
-def airport_list():
+
+def calculate_trend_data(airport_data, delay_col):
+    grouped_data = airport_data.groupby(["Month"]).agg(
+        mean_delay=(delay_col, "mean"),
+        count_total=("Flight_Number_Reporting_Airline", "count"),
+        count_delayed=(delay_col, lambda x: x[x > 0].count()),
+        count_cancelled=("Cancelled", "sum"),
+        count_ontime=(delay_col, lambda x: x[x <= 0].count())
+    )
+
+    # Calculer les pourcentages
+    grouped_data["pct_delayed"] = (grouped_data["count_delayed"] / grouped_data["count_total"]) * 100
+    grouped_data["pct_cancelled"] = (grouped_data["count_cancelled"] / grouped_data["count_total"]) * 100
+    grouped_data["pct_ontime"] = (grouped_data["count_ontime"] / grouped_data["count_total"]) * 100
+
+    return grouped_data
+
+
+@app.route("/api/airport_dep_list", methods=["GET"])
+def airport_dep_list():
     airport_list = sorted(data["Origin"].unique())
     return jsonify({"airport_list": airport_list})
 
-@app.route("/api/year_list", methods=["GET"])
-def year_list():
+
+@app.route("/api/airport_dest_list", methods=["GET"])
+def airport_dest_list():
+    airport_list = sorted(data["Dest"].unique())
+    return jsonify({"airport_list": airport_list})
+
+
+@app.route("/api/airport_dep_delay_trend", methods=["GET"])
+def airport_dep_delay_trend():
     airport_code = request.args.get("airport_code")
     if not airport_code:
         return jsonify({"error": "Paramètre 'airport_code' manquant"}), 400
 
-    # Filtrer les données pour l'aéroport spécifié et extraire les années
     airport_data = data[data["Origin"] == airport_code]
-    year_list = sorted(airport_data["Year"].unique())
+    grouped_data = calculate_trend_data(airport_data, "DepDelayMinutes")
 
-    # Convertir les entiers int64 en int
-    year_list = [int(year) for year in year_list]
+    # Préparer les données pour le JSON
+    trend_data = {key: list(grouped_data[key]) for key in grouped_data.columns}
+    trend_data["Month"] = list(grouped_data.index)
 
-    # Renvoyer la liste des années sous forme de JSON
-    return jsonify({"year_list": year_list})
+    return jsonify(trend_data)
 
-@app.route("/api/airport_delay_trend", methods=["GET"])
-def airport_delay_trend():
+
+@app.route("/api/airport_arr_delay_trend", methods=["GET"])
+def airport_arr_delay_trend():
     airport_code = request.args.get("airport_code")
-    year = request.args.get("year")  # Modification ici
     if not airport_code:
         return jsonify({"error": "Paramètre 'airport_code' manquant"}), 400
-    if not year:
-        return jsonify({"error": "Paramètre 'year' manquant"}), 400
 
-    # Filtrer les données pour l'aéroport et l'année spécifiés et calculer les statistiques de retard
-    airport_data = data[(data["Origin"] == airport_code) & (data["Year"] == int(year))]
-    grouped_data = airport_data.groupby(["Month"]).agg({"ArrDelayMinutes": "mean"})
-    trend_data = {"Month": list(grouped_data.index), "mean_delay": list(grouped_data["ArrDelayMinutes"])}
+    airport_data = data[data["Dest"] == airport_code]
+    grouped_data = calculate_trend_data(airport_data, "ArrDelayMinutes")
 
-    # Renvoyer les données sous forme de JSON
+    # Préparer les données pour le JSON
+    trend_data = {key: list(grouped_data[key]) for key in grouped_data.columns}
+    trend_data["Month"] = list(grouped_data.index)
+
     return jsonify(trend_data)
 
 
