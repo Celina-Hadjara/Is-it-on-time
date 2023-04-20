@@ -7,8 +7,7 @@ CORS(app)
 
 # Charger les données de retard et les préparer pour l'analyse
 data = pd.read_csv('../ML/Datasets/DataFlightVersionFinal.csv')
-# Charger les données de retard et les préparer pour l'analyse
-data = pd.read_csv('../ML/Datasets/DataFlightVersionFinal.csv')
+
 data = data[data["Year"] > 2014]
 
 
