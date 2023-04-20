@@ -1,7 +1,12 @@
+import sys
+
 from flask import jsonify, request, Blueprint
-from Server.data_loader import DataLoader
+from pathlib import Path
+
+from DataLoader.data_loader import DataLoader
 
 app = Blueprint('Airline', __name__)
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Charger les données de retard et les préparer pour l'analyse
 data = DataLoader.data
@@ -31,8 +36,7 @@ def list_code_companies():
 @app.route("/api/companie_delay_compa", methods=["GET"])
 def companie_delay_compa():
     # Filtrer les données pour la companie et l'année spécifiés et calculer les statistiques de retard
-    companies_data = data[(data["Year"] <= 2015)]
-    grouped_data = companies_data.groupby(["Reporting_Airline"]).agg({"ArrDelayMinutes": "mean"})
+    grouped_data = data.groupby(["Reporting_Airline"]).agg({"ArrDelayMinutes": "mean"})
     trend_data = {"Reporting_Airline": list(grouped_data.index), "mean_delay": list(grouped_data["ArrDelayMinutes"])}
 
     # Renvoyer les données sous forme de JSON
@@ -62,11 +66,11 @@ def companie_cancelled():
         return jsonify({"error": "Paramètre 'companie_code' manquant"}), 400
 
     # Filtrer les données pour la companie et l'année spécifiés et calculer le nombre de vols annulés
-    companies_data = data[(data["Reporting_Airline"] == companie_code) & (data["Year"] <= 2015)]
+    companies_data = data[(data["Reporting_Airline"] == companie_code)]
     grouped_data = companies_data.groupby(["Month"]).agg(
-        {"Cancelled": "sum", "Flight_Number_Reporting_Airline": "count"})
+        {"Cancelled": "sum", "Unique_Flight_ID": "count"})
     cancelled_data = {"Month": list(grouped_data.index), "sum_cancelled": list(grouped_data["Cancelled"]),
-                      "count_flights": list(grouped_data["Flight_Number_Reporting_Airline"])}
+                      "count_flights": list(grouped_data["Unique_Flight_ID"])}
     # Renvoyer les données sous forme de JSON
     return jsonify(cancelled_data)
 
@@ -83,8 +87,7 @@ def state_delay_trend():
 
     # Filtrer les données pour les etats(origin --> dest) et l'année spécifiés et calculer les statistiques de retard
     companies_data = data[
-        (data["OriginStateName"] == state_origin_name) & (data["DestStateName"] == state_dest_name) & (
-                data["Year"] <= 2015)]
+        (data["OriginStateName"] == state_origin_name) & (data["DestStateName"] == state_dest_name)]
     grouped_data = companies_data.groupby(["Month"]).agg({"ArrDelayMinutes": "mean"})
     trend_data = {"Month": list(grouped_data.index), "mean_delay": list(grouped_data["ArrDelayMinutes"])}
 
@@ -104,13 +107,10 @@ def city_delay_trend():
 
     # Filtrer les données pour les etats(origin --> dest) et l'année spécifiés et calculer les statistiques de retard
     companies_data = data[
-        (data["OriginCityName"] == originCityName) & (data["DestCityName"] == destCityName) & (data["Year"] <= 2015)]
+        (data["OriginCityName"] == originCityName) & (data["DestCityName"] == destCityName)]
     grouped_data = companies_data.groupby(["Month"]).agg({"ArrDelayMinutes": "mean"})
     trend_data = {"Month": list(grouped_data.index), "mean_delay": list(grouped_data["ArrDelayMinutes"])}
 
     # Renvoyer les données sous forme de JSON
     return jsonify(trend_data)
 
-
-if __name__ == "__main__":
-    app.run(debug=True)
