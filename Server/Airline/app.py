@@ -50,9 +50,9 @@ def companie_delay_trend():
         return jsonify({"error": "Paramètre 'companie_code' manquant"}), 400
 
     # Filtrer les données pour la companie et l'année spécifiés et calculer les statistiques de retard
-    companies_data = data[(data["Reporting_Airline"] == companie_code) & (data["Year"] <= 2015)]
-    grouped_data = companies_data.groupby(["Month"]).agg({"ArrDelay": "mean"})
-    trend_data = {"Month": list(grouped_data.index), "mean_delay": list(grouped_data["ArrDelay"])}
+    companies_data = data[(data["Reporting_Airline"] == companie_code)]
+    grouped_data = companies_data.groupby(["Month"]).agg({"ArrDelayMinutes": "mean"})
+    trend_data = {"Month": list(grouped_data.index), "mean_delay": list(grouped_data["ArrDelayMinutes"])}
 
     # Renvoyer les données sous forme de JSON
     return jsonify(trend_data)
