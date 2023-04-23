@@ -14,27 +14,31 @@ data = DataLoader.data
 @app.route('/api/origins', methods=['GET'])
 def get_origins():
     # Récupérer la liste des villes d'origine
-    origins = list(data['OriginCityName'].unique())
+    origins = list(data['Origin'].unique())
     return jsonify(origins)
+
 
 @app.route('/api/destinations', methods=['GET'])
 def get_destinations():
     # Récupérer la liste des villes de destination
-    destinations = list(data['DestCityName'].unique())
+    destinations = list(data['Dest'].unique())
     return jsonify(destinations)
+
 
 @app.route('/api/causes_delay', methods=['GET'])
 def get_delay():
     # Récupérer les paramètres d'entrée depuis la requête HTTP
-    origin_city = request.args.get('OriginCityName')
-    dest_city = request.args.get('DestCityName')
+    origin = request.args.get('Origin')
+    dest = request.args.get('Dest')
 
     # Filtrer les données selon les paramètres d'entrée
+
     filtered = data[(data['OriginCityName'] == origin_city) & (data['DestCityName'] == dest_city)]
 
     #print(filtered)
     #print(origin_city)
     #print(dest_city)
+
 
     # Calculer la médiane de retard par cause
     mean_carrier_delay = filtered['CarrierDelay'].mean()
@@ -51,7 +55,7 @@ def get_delay():
         'SecurityDelay': mean_security_delay,
         'LateAircraftDelay': mean_late_aircraft_delay
     }
-    print (result)
+
     # Renvoyer l'objet JSON en réponse à la requête HTTP
     return jsonify(result)
 

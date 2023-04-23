@@ -36,8 +36,8 @@ def list_code_companies():
 @app.route("/api/companie_delay_compa", methods=["GET"])
 def companie_delay_compa():
     # Filtrer les données pour la companie et l'année spécifiés et calculer les statistiques de retard
-    grouped_data = data.groupby(["Reporting_Airline"]).agg({"ArrDelayMinutes": "mean"})
-    trend_data = {"Reporting_Airline": list(grouped_data.index), "mean_delay": list(grouped_data["ArrDelayMinutes"])}
+    grouped_data = data.groupby(["Reporting_Airline"]).agg({"ArrDelay": "mean"})
+    trend_data = {"Reporting_Airline": list(grouped_data.index), "mean_delay": list(grouped_data["ArrDelay"])}
 
     # Renvoyer les données sous forme de JSON
     return jsonify(trend_data)
@@ -88,8 +88,8 @@ def state_delay_trend():
     # Filtrer les données pour les etats(origin --> dest) et l'année spécifiés et calculer les statistiques de retard
     companies_data = data[
         (data["OriginStateName"] == state_origin_name) & (data["DestStateName"] == state_dest_name)]
-    grouped_data = companies_data.groupby(["Month"]).agg({"ArrDelayMinutes": "mean"})
-    trend_data = {"Month": list(grouped_data.index), "mean_delay": list(grouped_data["ArrDelayMinutes"])}
+    grouped_data = companies_data.groupby(["Month"]).agg({"ArrDelay": "mean"})
+    trend_data = {"Month": list(grouped_data.index), "mean_delay": list(grouped_data["ArrDelay"])}
 
     # Renvoyer les données sous forme de JSON
     return jsonify(trend_data)
@@ -108,8 +108,8 @@ def city_delay_trend():
     # Filtrer les données pour les etats(origin --> dest) et l'année spécifiés et calculer les statistiques de retard
     companies_data = data[
         (data["OriginCityName"] == originCityName) & (data["DestCityName"] == destCityName)]
-    grouped_data = companies_data.groupby(["Month"]).agg({"ArrDelayMinutes": "mean"})
-    trend_data = {"Month": list(grouped_data.index), "mean_delay": list(grouped_data["ArrDelayMinutes"])}
+    grouped_data = companies_data.groupby(["Month"]).agg({"ArrDelay": "mean"})
+    trend_data = {"Month": list(grouped_data.index), "mean_delay": list(grouped_data["ArrDelay"])}
 
     # Renvoyer les données sous forme de JSON
     return jsonify(trend_data)
