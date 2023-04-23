@@ -14,22 +14,22 @@ data = DataLoader.data
 @app.route('/api/origins', methods=['GET'])
 def get_origins():
     # Récupérer la liste des villes d'origine
-    origins = list(data['Origin'].unique())
+    origins = list(data['OriginCityName'].unique())
     return jsonify(origins)
 
 
 @app.route('/api/destinations', methods=['GET'])
 def get_destinations():
     # Récupérer la liste des villes de destination
-    destinations = list(data['Dest'].unique())
+    destinations = list(data['DestCityName'].unique())
     return jsonify(destinations)
 
 
 @app.route('/api/causes_delay', methods=['GET'])
 def get_delay():
     # Récupérer les paramètres d'entrée depuis la requête HTTP
-    origin = request.args.get('Origin')
-    dest = request.args.get('Dest')
+    origin_city = request.args.get('OriginCityName')
+    dest_city = request.args.get('DestCityName')
 
     # Filtrer les données selon les paramètres d'entrée
 
