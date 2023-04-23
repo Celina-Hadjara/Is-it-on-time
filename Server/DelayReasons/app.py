@@ -10,9 +10,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 # Charger les données de retard et les préparer pour l'analyse
 data = DataLoader.data
 
-#Analyse causes des retards
-# Filtrer les données à partir de 2015
-data2015 = data[data['Year'] >= 2015]
 
 @app.route('/api/origins', methods=['GET'])
 def get_origins():
@@ -33,31 +30,28 @@ def get_delay():
     dest_city = request.args.get('DestCityName')
 
     # Filtrer les données selon les paramètres d'entrée
-    filtered = data2015[(data2015['OriginCityName'] == origin_city) & (data2015['DestCityName'] == dest_city)]
-    
+    filtered = data[(data['OriginCityName'] == origin_city) & (data['DestCityName'] == dest_city)]
+
     #print(filtered)
     #print(origin_city)
     #print(dest_city)
-    
+
     # Calculer la médiane de retard par cause
-    median_carrier_delay = filtered['CarrierDelay'].median()
-    median_weather_delay = filtered['WeatherDelay'].median()
-    median_nas_delay = filtered['NASDelay'].median()
-    median_security_delay = filtered['SecurityDelay'].median()
-    median_late_aircraft_delay = filtered['LateAircraftDelay'].median()
+    mean_carrier_delay = filtered['CarrierDelay'].mean()
+    mean_weather_delay = filtered['WeatherDelay'].mean()
+    mean_nas_delay = filtered['NASDelay'].mean()
+    mean_security_delay = filtered['SecurityDelay'].mean()
+    mean_late_aircraft_delay = filtered['LateAircraftDelay'].mean()
 
     # Créer un objet JSON avec les médianes de retard par cause
     result = {
-        'CarrierDelay': median_carrier_delay,
-        'WeatherDelay': median_weather_delay,
-        'NASDelay': median_nas_delay,
-        'SecurityDelay': median_security_delay,
-        'LateAircraftDelay': median_late_aircraft_delay
+        'CarrierDelay': mean_carrier_delay,
+        'WeatherDelay': mean_weather_delay,
+        'NASDelay': mean_nas_delay,
+        'SecurityDelay': mean_security_delay,
+        'LateAircraftDelay': mean_late_aircraft_delay
     }
     print (result)
     # Renvoyer l'objet JSON en réponse à la requête HTTP
     return jsonify(result)
 
-
-if __name__ == "__main__":
-    app.run(debug=True)
