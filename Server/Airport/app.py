@@ -47,7 +47,7 @@ def airport_dep_delay_trend():
         return jsonify({"error": "Paramètre 'airport_code' manquant"}), 400
 
     airport_data = data[data["Origin"] == airport_code]
-    grouped_data = calculate_trend_data(airport_data, "DepDelayMinutes")
+    grouped_data = calculate_trend_data(airport_data, "DepDelay")
 
     # Préparer les données pour le JSON
     trend_data = {key: list(grouped_data[key]) for key in grouped_data.columns}
@@ -63,7 +63,7 @@ def airport_arr_delay_trend():
         return jsonify({"error": "Paramètre 'airport_code' manquant"}), 400
 
     airport_data = data[data["Dest"] == airport_code]
-    grouped_data = calculate_trend_data(airport_data, "ArrDelayMinutes")
+    grouped_data = calculate_trend_data(airport_data, "ArrDelay")
 
     # Préparer les données pour le JSON
     trend_data = {key: list(grouped_data[key]) for key in grouped_data.columns}
