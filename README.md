@@ -43,8 +43,6 @@ En raison de l'espace insuffisant de Git LFS, nous avons fait le choix de ne pas
 
 - Placez les dossiers  "model_save" et "encoder"  dans le dossier "prediction".
 
-- Placez le fichier "DataFlightVersionFinal.csv" dans le dossier "ML > Datasets".
-
 ### Lancer l'application
 Après avoir installé les dépendances nécessaires et téléchargé les fichiers requis, vous pouvez lancer l'application Flask en utilisant la commande suivante depuis la ligne de commande :
 
