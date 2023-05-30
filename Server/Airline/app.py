@@ -5,6 +5,7 @@ from pathlib import Path
 
 from DataLoader.data_loader import DataLoader
 
+
 app = Blueprint('Airline', __name__)
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
