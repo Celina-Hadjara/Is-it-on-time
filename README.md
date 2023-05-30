@@ -18,6 +18,9 @@ Notre application offre une gamme de services, notamment :
 ## Lien vers le site de présentation
 Pour accéder à notre site de présentation, veuillez visiter notre site web : https://flight.my.canva.site/flight-time
 
+## Architecture 
+
+![Architecture](https://github.com/Celina-Hadjara/Is-it-on-time/blob/41991f18576d58c778ea4c62d4fa1240136a4b8a/image.png)
 
 
 ## Comment lancer le projet
